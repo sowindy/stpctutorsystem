@@ -1,0 +1,2 @@
+[ 2014-02-17T18:10:01+08:00 ] ERR: (ThinkException) 非法操作allocatetutorhandler
+[ 2014-02-17T19:28:15+08:00 ] ERR: (ThinkException) 模板不存在[.//Tpl/default/Adminstpc/allocatepractice.html]

@@ -1,0 +1,27 @@
+<include file="Global:header_top" />
+<div id="main">
+    <div class="profile_block">
+        <form method="post" action="@#:U('handler')#@">
+            <input type="hidden" name="ha" value="@#$ha#@" />
+            <input type="hidden" name="type" value="<?php echo ACTION_NAME; ?>" />
+            <div class="profile_wrapper">
+                <span>公司的名称：</span><input type="text" id="tag_input" class="user_input" name="corporate" value="" />
+            </div>
+            <div class="profile_wrapper">
+                <span>填写人姓名：</span><input type="text" id="tag_input" class="user_input" name="name" value="" />
+            </div>
+            <div class="profile_wrapper">
+                <span>填写人邮箱：</span><input type="text" id="tag_input" class="user_input" name="email" value="" />
+            </div>
+            <div class="profile_wrapper">
+                <span>填写人手机：</span><input type="text" id="tag_input" class="user_input" name="phone" value="" />
+            </div>
+            <div class="w"></div>
+            <div class="profile_wrapper">
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><input type="submit" name="" value="保存" class="rect_button save" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="reset" name="" value="重置" class="rect_button save" />
+            </div>
+        </form>
+    </div>
+</div>
+<include file="Global:footer" />

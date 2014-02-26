@@ -1,0 +1,11 @@
+RewriteEngine on
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} Cache/tile
+RewriteRule tile-([0-9]+)-([0-9]+)-([0-9]+)-([a-z]*)-?([^-^\.]*)-?([^-^\.]*)-?([^-^\.]*)-?([^-^\.]*) Index/tile?zoom=$1&x=$2&y=$3&type=$4&model=$5&field=$6&progress=$7&res_tags=$8 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php/$1 [QSA,PT,L]
+
+RewriteCond %{REQUEST_URI} Uploads/
+RewriteRule ^(.*)$ index.php/ [QSA,PT,L]

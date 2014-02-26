@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                <meta name="keywords" content="<php>echo $keywords==NULL?$setting['site_keywords']:$keywords;</php>" />
+                <meta name="description" content="<php>echo $description==NULL?$setting['site_description']:$description;</php>"  />
+                <meta name="author" content="" />
+                <meta name="copyright" content="" />
+                <link rel="shortcut icon" href="__PUBLIC__/css/favicon.ico" />
+                <title><php>echo ($user['newmsg']!=0||$user['newnotice']!=0)?'('.($user['newmsg']+$user['newnotice']).')'.$title:$title;</php></title>
+		<!--basic styles-->
+		<link href="__BOOTCSS__/bootstrap.min.css" rel="stylesheet" />
+		<link href="__BOOTCSS__/bootstrap-responsive.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="__BOOTCSS__/font-awesome.min.css" />
+		<!--[if IE 7]>
+		  <link rel="stylesheet" href="__BOOTCSS__/font-awesome-ie7.min.css" />
+		<![endif]-->
+		<!--page specific plugin styles-->
+		<link rel="stylesheet" href="__BOOTCSS__/prettify.css" />
+		<!--ace styles-->
+		<link rel="stylesheet" href="__BOOTCSS__/ace.min.css" />
+		<link rel="stylesheet" href="__BOOTCSS__/ace-responsive.min.css" />
+		<link rel="stylesheet" href="__BOOTCSS__/ace-skins.min.css" />
+		<!--[if lte IE 8]>
+		  <link rel="stylesheet" href="__BOOTCSS__/ace-ie.min.css" />
+		<![endif]-->
+		<!--inline styles related to this page-->
+
+	<body>
+                <div class="navbar">
+			<div class="navbar-inner">
+				<div class="container-fluid">
+					<a href="#" class="brand">
+						<small>
+							<i class="icon-leaf"></i>
+							人文与社会科学学院
+						</small>
+					</a><!--/.brand-->
+				</div><!--/.container-fluid-->
+			</div><!--/.navbar-inner-->
+		</div>
+		<div class="main-container container-fluid">
+			<a class="menu-toggler" id="menu-toggler" href="#">
+				<span class="menu-text"></span>
+			</a>
+
+			<div class="sidebar" id="sidebar">
+				<div class="sidebar-shortcuts" id="sidebar-shortcuts">
+					<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+						<button class="btn btn-small btn-success">
+							<i class="icon-signal"></i>
+						</button>
+
+						<button class="btn btn-small btn-info">
+							<i class="icon-pencil"></i>
+						</button>
+
+						<button class="btn btn-small btn-warning">
+							<i class="icon-group"></i>
+						</button>
+
+						<button class="btn btn-small btn-danger">
+							<i class="icon-cogs"></i>
+						</button>
+					</div>
+
+					<div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+						<span class="btn btn-success"></span>
+
+						<span class="btn btn-info"></span>
+
+						<span class="btn btn-warning"></span>
+
+						<span class="btn btn-danger"></span>
+					</div>
+				</div><!--#sidebar-shortcuts-->
+
+				<ul class="nav nav-list">
+                                        <li>
+						<a href="@#:U('index')#@">
+							<i class="icon-dashboard"></i>
+							<span class="menu-text"> 首页 </span>
+						</a>
+					</li>
+
+					<li>
+						<a href="@#:U('info')#@">
+							<i class="icon-text-width"></i>
+							<span class="menu-text"> 企业信息 </span>
+						</a>
+					</li>
+
+					<li>
+						<a href="#" class="dropdown-toggle">
+							<i class="icon-desktop"></i>
+							<span class="menu-text"> 岗位 </span>
+
+							<b class="arrow icon-angle-down"></b>
+						</a>
+
+						<ul class="submenu" style="display: block">
+							<li>
+								<a href="@#:U('position')#@">
+									<i class="icon-double-angle-right"></i>
+									岗位列表
+								</a>
+							</li>
+
+							<li class="active">
+								<a href="@#:U('newposition')#@">
+									<i class="icon-double-angle-right"></i>
+									新增岗位
+								</a>
+							</li>
+
+                                                </ul>
+					</li>
+                                        <li>
+						<a href="@#:U('Index/index')#@">
+							<i class="icon-list-alt"></i>
+							<span class="menu-text"> 返回论坛 </span>
+						</a>
+					</li>
+				</ul><!--/.nav-list-->
+
+				<div class="sidebar-collapse" id="sidebar-collapse">
+					<i class="icon-double-angle-left"></i>
+				</div>
+			</div>
+
+			<div class="main-content">
+
+				<div class="breadcrumbs" id="breadcrumbs">
+				</div>
+
+				<div class="page-content">
+                                    <table class="table table-bordered table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <td>编号</td>
+                                                <td>联系人姓名</td>
+                                                <td>手机/电话</td>
+                                                <td>邮箱</td>
+                                                <td>岗位接受人数</td>
+                                                <td>岗位名称</td>
+                                                <td style="width: 25%">操作</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $i = 1;foreach($allposition as $one): ?>
+                                            <tr>
+                                                <td>@#$i#@</td>
+                                                <td>@#$one.contacts#@</td>
+                                                <td>@#$one.phone#@<?php if($one['phone']&&$one['tel']): ?>/<?php endif; ?>@#$one.tel#@</td>
+                                                <td>@#$one.email#@</td>
+                                                <td>@#$one.num#@</td>
+                                                <td>@#$one.station#@</td>
+                                                <td style="width: 25%">
+                                                    <?php if($one['demand']): ?>
+                                                    <a href="#detail@#$one.id#@" class="btn btn-small btn-success" data-toggle="modal">实习要求</a>
+                                                    <div id="detail@#$one.id#@" class="modal hide fade span8" style="left: 20%" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                        <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                                <h3 id="myModalLabel">岗位实习要求</h3>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="span7 infobox-container">
+                                                                <div class="infobox infobox-blue"  style="width: 614px">
+                                                                        <div class="infobox-data">
+                                                                                <div class="infobox-content"><?php echo htmlspecialchars_decode($one['demand']); ?></div>
+                                                                        </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                                <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">关闭</button>
+                                                        </div>
+                                                    </div>
+                                                    <?php else: ?>
+                                                    <a href="#" class="btn btn-small btn-success disabled">实习要求</a>
+                                                    <?php endif; ?>
+                                                    <a href="@#:U('editposition',array('id'=>$one['id']))#@" class="btn btn-small btn-info">编辑</a>
+                                                    <?php if($one['status'] == 1): ?>
+                                                    <a href="@#:U('cancelposition',array('id'=>$one['id']))#@" class="btn btn-small btn-danger">取消发布</a>
+                                                    <?php elseif($one['status'] == 0): ?>
+                                                    <a href="@#:U('publishposition',array('id'=>$one['id']))#@" class="btn btn-small btn-warning">发布</a>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                            <?php $i++;endforeach; ?>
+                                        </tbody>
+                                    </table>
+				</div><!--/.page-content-->
+			</div><!--/.main-content-->
+		</div><!--/.main-container-->
+
+		<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-small btn-inverse">
+			<i class="icon-double-angle-up icon-only bigger-110"></i>
+		</a>
+
+		<!--basic scripts-->
+
+		<!--[if !IE]>-->
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+		<!--<![endif]-->
+
+		<!--[if IE]>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<![endif]-->
+
+		<!--[if !IE]>-->
+
+		<script type="text/javascript">
+			window.jQuery || document.write("<script src='__BOOTJS__/jquery-2.0.3.min.js'>"+"<"+"/script>");
+		</script>
+
+		<!--<![endif]-->
+
+		<!--[if IE]>
+<script type="text/javascript">
+ window.jQuery || document.write("<script src='__BOOTJS__/jquery-1.10.2.min.js'>"+"<"+"/script>");
+</script>
+<![endif]-->
+
+		<script type="text/javascript">
+			if("ontouchend" in document) document.write("<script src='__BOOTJS__/jquery.mobile.custom.min.js'>"+"<"+"/script>");
+		</script>
+		<script src="__BOOTJS__/bootstrap.min.js"></script>
+
+		<!--page specific plugin scripts-->
+
+		<script src="__BOOTJS__/prettify.js"></script>
+                <script src="__BOOTJS__/jquery.autosize-min.js"></script>
+                <script src="__BOOTJS__/fuelux/fuelux.wizard.min.js"></script>
+		<!--ace scripts-->
+
+		<script src="__BOOTJS__/ace-elements.min.js"></script>
+		<script src="__BOOTJS__/ace.min.js"></script>
+
+
+		<!--inline scripts related to this page-->
+
+		<script type="text/javascript">
+			$(function() {
+			
+				window.prettyPrint && prettyPrint();
+				$('#id-check-horizontal').removeAttr('checked').on('click', function(){
+					$('#dt-list-1').toggleClass('dl-horizontal').prev().html(this.checked ? '&lt;dl class="dl-horizontal"&gt;' : '&lt;dl&gt;');
+				});
+			})
+                        $('textarea[class*=autosize]').autosize({append: "\n"});
+                        $('#modal-wizard .modal-header').ace_wizard();
+                        $('#modal-wizard .wizard-actions .btn[data-dismiss=modal]').removeAttr('disabled');
+		</script>
+	</body>
+</html>
