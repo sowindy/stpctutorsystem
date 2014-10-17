@@ -9,9 +9,9 @@ return array (
   6 => 'demand',
   7 => 'station',
   8 => 'status',
-  9 => 'num',
-  10 => 'time',
-  11 => 'email',
+  9 => 'time',
+  10 => 'email',
+  11 => 'num',
   '_autoinc' => true,
   '_pk' => 'id',
 );

@@ -7,9 +7,11 @@ define("INC", ture);
 class AdminstpcAction extends BaseAction{
 	private function tologin(){
 		$this->uid || exit('Error');
+		
 	}
 
 	public function index(){
+
 		$apply_mysql = M('apply');
                 $apply = $apply_mysql->select();
                 $user_mysql = M('user');
@@ -25,18 +27,44 @@ class AdminstpcAction extends BaseAction{
             
             $user_mysql = M('user');
             $apply_mysql = M('apply');
+			
+			$mes = $apply_mysql->find($this->get['id']);
             
+			
             $type = $apply_mysql->field('type')->find($this->get['id']);
             if($type['type'] == 'tutor'){
                 $user_mysql->where(array('id'=>$this->get['id']))->data(array('type'=>2))->save();
             }elseif($type['type'] == 'stu'){
-                $user_mysql->where(array('id'=>$this->get['id']))->data(array('type'=>1))->save();
+                $user_mysql->where(array('id'=>$this->get['id']))->data(array('type'=>1,'in_date'=>$mes['in_date'],'stu_email'=>$mes['email'],'stu_name'=>$mes['name'],'stu_number'=>$mes['number'],'stu_phone'=>$mes['phone']))->save();
             }elseif($type['type'] == 'practice'){
                 $user_mysql->where(array('id'=>$this->get['id']))->data(array('type'=>3))->save();
             }
             
             $apply_mysql->where(array('id'=>$this->get['id']))->delete();
             
+			
+		$letterid = M('letter')->add(array(
+            'to' => $this->get['id'],
+            'content' => '恭喜您，您的申请已经通过，您现在可以点击右上角的@图标便可进入后台管理界面',
+            'addtime' => time(),
+            'from' => $this->uid
+        ));
+        if (M('letterview')->add(array(
+            'to' => $this->get['id'],
+            'content' => '恭喜您，您的申请已经通过，您现在可以点击右上角的@图标便可进入后台管理界面',
+            'addtime' => time(),
+            'from' => $this->uid,
+            'letterid' => $letterid
+        ))) {
+            $user_mysql->where(array(
+                'id' => $this->get['id']
+            ))->setInc('newmsg');
+            M('newmsg')->add(array(
+                'name' => 'admin',
+                'letterid' => $letterid,
+                'uid' => $this->get['id']
+            ));
+		}
             $this->redirect('index');
             
         }
@@ -46,6 +74,31 @@ class AdminstpcAction extends BaseAction{
             
             $apply_mysql = M('apply');
             $apply_mysql->where(array('id'=>$this->get['id']))->delete();
+			
+			
+		$letterid = M('letter')->add(array(
+            'to' => $this->get['id'],
+            'content' => 'sorry,您的申请没有通过！',
+            'addtime' => time(),
+            'from' => $this->uid
+        ));
+        if (M('letterview')->add(array(
+            'to' => $this->get['id'],
+            'content' => 'sorry,您的申请没有通过！',
+            'addtime' => time(),
+            'from' => $this->uid,
+            'letterid' => $letterid
+        ))) {
+            M('user')->where(array(
+                'id' => $this->get['id']
+            ))->setInc('newmsg');
+            M('newmsg')->add(array(
+                'name' => 'admin',
+                'letterid' => $letterid,
+                'uid' => $this->get['id']
+            ));
+		}
+			
             $this->redirect('index');
         }
 
@@ -53,10 +106,15 @@ class AdminstpcAction extends BaseAction{
 	//显示发布的导师信息
 	//显示待分配的学生与可分配的导师(导师的右侧有导师已有学生的人数)
 	public function allocatetutor(){
+		
+		if(!$grade = $this->get['grade']){
+			$grade = date('Y');
+		}
+		
 		$user_mysql = M('user');
 		$stututor_mysql = M('stututor');
 		//列出所有未选择导师的学生
-		$allstu = $user_mysql->where(array('type'=>1))->select();
+		$allstu = $user_mysql->where(array('type'=>1,'in_date'=>$grade))->select();
 		$stu = array();
 		foreach ($allstu as $one) {
 			if(!$stututor_mysql->where(array('stu_id'=>$one['id'],'status'=>1))->find()){
@@ -75,14 +133,15 @@ class AdminstpcAction extends BaseAction{
 		foreach ($alltutor as $one) {
 			$temp = $tutor_mysql->find($one['id']);
 			if($temp){
-				$temp['stunumber'] = $stututor_mysql->where(array('tutor_id'=>$one['id'],'status'=>1))->count();
+				$temp['stunumber'] = $stututor_mysql->where(array('tutor_id'=>$one['id'],'status'=>1,'in_date'=>$grade))->count();
 				array_push($tutor, $temp);
 			}
 		}
-
+	
 
 		$this->assign('stu',$stu);
 		$this->assign('tutor',$tutor);
+		$this->assign('grade',$grade);
                 
 
 		$this->display();
@@ -90,24 +149,28 @@ class AdminstpcAction extends BaseAction{
 
 	//管理员分配，删除所有学生所选择的志愿，并提示是管理员分配
         public function allocatetutorhandler(){
+        	$grade = $this->post['grade'];
+			
+			if(is_null($grade)) die('Error');
+			
             $_POST['stu'] && $_POST['tutor'] || exit("Error!");
             //导师所带学生人数
             $stututor_mysql = M('stututor');
-            $stunumber = $stututor_mysql->where(array('tutor_id'=>$_POST['tid'],'status'=>1))->count();
+            $stunumber = $stututor_mysql->where(array('tutor_id'=>$_POST['tid'],'status'=>1,'in_date'=>$grade))->count();
             if((count($_POST['stu'])+$stunumber) >= C('MAX_STU_NUM')){
                 exit('Tutor MAX_STU_NUM over!');
             }
             foreach($_POST['stu'] as $one){
-                $this->allocatetutorhandler2($one, $_POST['tutor']);
+                $this->allocatetutorhandler2($one, $_POST['tutor'],$grade);
             }
             $this->redirect('allocatetutor');
             
         }
-        private function allocatetutorhandler2($sid,$tid){
+        private function allocatetutorhandler2($sid,$tid,$grade){
 		$sid && $tid || exit('Error!');
 		$stututor_mysql = M('stututor');
 		$stututor_mysql->where(array('stu_id'=>$sid))->delete();
-		$stututor_mysql->data(array('stu_id'=>$sid,'tutor_id'=>$tid,'status'=>1,'isadmin'=>1))->add();
+		$stututor_mysql->data(array('stu_id'=>$sid,'tutor_id'=>$tid,'status'=>1,'isadmin'=>1,'in_date'=>$grade))->add();
 	}
 
 	//查看某位老师的所有学生
@@ -119,6 +182,7 @@ class AdminstpcAction extends BaseAction{
 	//显示发布的实习岗位
 	//岗位右侧显示已有的学生和岗位已招收的人数
 	public function allocatepractice(){
+            
 		//列出所有未实习的学生
 		$user_mysql = M('user');
 		$stupractice_mysql = M('stupractice');
@@ -189,12 +253,16 @@ class AdminstpcAction extends BaseAction{
 
 	//编辑某位学生的个人信息
 	public function viewstu(){
+			if(!($grade = $this->get['grade'])){
+				$grade = date('Y');
+			}
+			
             $user_mysql = M('user');
             $tutor_mysql = M('tutor');
             $stututor_mysql = M('stututor');
             $practice_mysql = M('practice');
             $stupractice_mysql = M('stupractice');
-            $allstu = $user_mysql->where(array('type'=>1))->select();
+            $allstu = $user_mysql->where(array('type'=>1,'in_date'=>$grade))->field('id,stu_number,stu_name,stu_sex,stu_QQ,stu_workplace,stu_email,stu_phone,in_date,stu_studyexperience,stu_workexperience,stu_honor,stu_selfvalue')->select();
             $stu = array();
             foreach($allstu as $one){
                 if($one['stu_name'] && $one['stu_number']){
@@ -220,7 +288,9 @@ class AdminstpcAction extends BaseAction{
                     array_push($stu, $one);
                 }
             }
+
             $this->assign('stu',$stu);
+			$this->assign('grade',$grade);
             $this->display();
 	}
         
@@ -255,25 +325,24 @@ class AdminstpcAction extends BaseAction{
 		foreach ($tutorid as $value) {
 			$temp = $tutor_mysql->find($value['id']);
                         $temp['stunumber'] = $stututor_mysql->where(array('tutor_id'=>$value['id'],'status'=>1))->count();
-			if($temp){
+			if($temp['id']){
 				array_push($tutor, $temp);
 			}
 		}
                 
 
 		$this->assign('tutor',$tutor);
-
 		$this->display();
 
 	}
 	//编辑导师的个人信息
 	public function edittutor(){
-		$_GET['id'] || exit('Error!');
+		$this->get['id'] || exit('Error!');
 		$tutor_mysql = M('tutor');
-		$tutor = $tutor_mysql->find($_GET['uid']);
+		$tutor = $tutor_mysql->find($this->get['id']);
 
 		$this->assign('tutorinfo',$tutor);
-		$this->assign('id',$_GET['id']);
+		$this->assign('id',$this->get['id']);
 		$this->display();
 	}
 	public function edittutorhandler(){
@@ -290,25 +359,6 @@ class AdminstpcAction extends BaseAction{
 		
 	}
 
-
-	//实习单位view
-	/*
-		返回数据格式如下：
-		array(
-			[0]=>array(
-					'uid' => ,
-					'corporate' => ,
-					'corporate_about' => ,
-					'stations' = array(
-							[0]=> array(
-									'id'=>,
-									'contacts'=>,
-									......
-								)
-						)
-				)
-		)
-	*/
 	public function position(){
 		$user_mysql = M('user');
 		$corporate = $user_mysql->where(array('type'=>3))->field('id,corporate,corporate_about')->select();
@@ -337,6 +387,8 @@ class AdminstpcAction extends BaseAction{
                 
                 $this->assign('adminuid',  $this->uid);
 		$this->assign('corporate',$corporate);
+                
+
 		$this->display();
 	}
         
@@ -351,6 +403,7 @@ class AdminstpcAction extends BaseAction{
             $temp = $this->post;
             $temp['uid'] = $this->uid;
             $temp['time'] = date('Y-m-d H:m:s');
+            print_r($temp);die;
             if($practice_mysql->data($temp)->add()){
                 $this->redirect('position');
             }else{
@@ -428,6 +481,126 @@ class AdminstpcAction extends BaseAction{
             $module_mysql->add(array('module'=>$module,'starttime'=>$starttime,'endtime'=>$endtime));
             $this->redirect('index', NULL, 2, 'success!');
         }
+		
+		
+		//导出某个年级的学生和导师表格
+		public function export_stu_tutor(){
+			$grade = $this->post['grade'];
+			if(!$grade) $grade = $this->get['grade'];
+			if(is_null($grade)) die("未选择年级，错误！");
+			$all = M('stututor')->where(array('in_date'=>$grade,'status'=>1))->select();
+			
+			$user_mysql = M('user');
+			$tutor_mysql = M('tutor');
+			$export = array();
+			$temp = array(
+				'teacher'=>'teacher',
+				'stu_number'=>'stu_num',
+				'stu_name'=>'stu_name',
+				'stu_sex'=>'stu_sex',
+				'stu_email'=>'stu_email',
+				'stu_phone'=>'stu_phone',
+				);
+			array_push($export,$temp);
+			foreach($all as $one){
+				$tutor = $tutor_mysql->field('name')->find($one['tutor_id']);
+				$stu = $user_mysql->find($one['stu_id']);
+				$temp['teacher'] = $tutor['name'];
+				$temp['stu_number'] = $stu['stu_number'];
+				$temp['stu_name'] = $stu['stu_name'];
+				$temp['stu_sex'] = $stu['stu_sex'];
+				$temp['stu_email'] = $stu['stu_email'];
+				$temp['stu_phone'] = $stu['stu_phone'];
+				
+				array_push($export,$temp);
+			}
+			$excel_action = new ExcelAction();
+			
+			$excel_action->to_export_excel($export);
+			
+		}
+
+		public function import_teacher(){
+			import('ORG.Net.UploadFile');
+			$upload = new UploadFile();
+			//$upload->allowExts  = array('xls','xlsx');
+			//$upload->allowTypes = array('xls','xlsx');
+			$upload->savePath =  THINK_PATH.'/../Public/upload/excel/';
+			if(!$upload->upload()) {
+				$this->error($upload->getErrorMsg());
+			}else{
+				$info =  $upload->getUploadFileInfo();
+			}
+			$excel = new ExcelAction();
+			$path = $info[0]['savepath'].$info[0]['savename'];
+			$data = $excel->to_inport_excel($path);
+			unlink($path);
+			
+			if(!$this->post['grade']) die('未选择年级');
+			
+			$user_mysql = M('user');
+			
+			foreach($data as $one){
+				if($user_mysql->where(array('name'=>$one['A']))->find()){
+					continue;
+				}
+				if($one['A'] && $one['B']){
+					$data['name'] = $one['A'];
+					$data['pwd'] = '6c77d8bdba19c57c62beb38cb37d62ba';
+					$data['stu_number'] = $one['A'];
+					$data['stu_name'] = $one['B'];
+					$data['type'] = 1;
+					$data['in_date'] = $this->post['grade'];
+					$user_mysql->data($data)->add();
+				}
+			}
+			
+			$this->redirect('viewstu',array('grade'=>$this->post['grade']));
+			
+		}
+
+		public function import_stu(){
+			import('ORG.Net.UploadFile');
+			$upload = new UploadFile();
+			//$upload->allowExts  = array('xls','xlsx');
+			//$upload->allowTypes = array('xls','xlsx');
+			$upload->savePath =  THINK_PATH.'/../Public/upload/excel/';
+			if(!$upload->upload()) {
+				$this->error($upload->getErrorMsg());
+			}else{
+				$info =  $upload->getUploadFileInfo();
+			}
+			$excel = new ExcelAction();
+			$path = $info[0]['savepath'].$info[0]['savename'];
+			$data = $excel->to_inport_excel($path);
+			unlink($path);
+			
+
+			
+			$user_mysql = M('user');
+			$tutor_mysql = M('tutor');
+			
+			foreach($data as $one){
+				if($user_mysql->where(array('name'=>$one['A']))->find()){
+					continue;
+				}
+				if($one['A'] && $one['B']){
+					$data['name'] = $one['A'];
+					$data['pwd'] = '6c77d8bdba19c57c62beb38cb37d62ba';
+					$data['stu_name'] = $one['B'];
+					$data['type'] = 2;
+					$id = $user_mysql->data($data)->add();
+					
+					if(!$id) continue;
+					
+					$tutor_mysql->data(array('id'=>$id,'name'=>$one['A']))->add();
+				}
+			}
+			
+			$this->redirect('viewtutor');
+			
+		}
+		
 }
 
 ?>

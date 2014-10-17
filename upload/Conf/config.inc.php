@@ -1,5 +1,6 @@
 <?php
     return array(
+    	'PHPEXCEL_PATH'=>'/stpctutorsystem/upload/Classes/PHPExcel.php',
         'DB_TYPE'=>'mysql',
         'DB_HOST'=>'localhost',
         'DB_NAME'=>'QuoraCms',
@@ -19,11 +20,11 @@
         'PAGE_LISTROWS'=>20, 
         'TMPL_PARSE_STRING'=>array
                 (
-                 '__PUBLIC__' => '/QuoraCms/upload/Public',
-                 '__SITE__' => '/QuoraCms/upload',
-                 '__BOOTJS__' => '/QuoraCms/upload/Public/assets/js',
-                 '__BOOTIMG__' => '/QuoraCms/upload/Public/assets/img',
-                 '__BOOTCSS__' => '/QuoraCms/upload/Public/assets/css',
+                 '__PUBLIC__' => '/stpctutorsystem/upload/Public',
+                 '__SITE__' => '/stpctutorsystem/upload',
+                 '__BOOTJS__' => '/stpctutorsystem/upload/Public/assets/js',
+                 '__BOOTIMG__' => '/stpctutorsystem/upload/Public/assets/img',
+                 '__BOOTCSS__' => '/stpctutorsystem/upload/Public/assets/css',
                 ),
         'MAX_STU_NUM'=>6,
     );

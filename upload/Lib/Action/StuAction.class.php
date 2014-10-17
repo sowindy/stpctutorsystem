@@ -9,8 +9,8 @@ class StuAction extends BaseAction{
     private function tologin(){
         $this->uid == NULL && $this->error("您还没有登录，请先登录！");
         $user_mysql = M('user');
-        $type = $user_mysql->where(array('id'=>  $this->uid))->getField('type');
-        if($type != 1){
+		$type = $user_mysql->field('type,in_date')->find($this->uid);
+        if($type['type'] != 1 || !$type['type'] || !$type['in_date']){
             exit('No Permission! to login');
         }
     }
@@ -25,7 +25,7 @@ class StuAction extends BaseAction{
     //如果有导师了，首页展示导师信息
     public function index(){
         $this->tologin();
-        $this->assign('title',学生后台管理首页);
+        $this->assign('title','学生后台管理首页');
         $user_mysql = M('user');
         
         //个人信息
@@ -39,7 +39,7 @@ class StuAction extends BaseAction{
     //修改个人信息界面
     public function info(){
         $this->tologin();
-        $this->assign('title',学生信息更新/修改);
+        $this->assign('title','学生信息更新/修改');
         $user_mysql = M('user');
         $stuinfo = $user_mysql->where(array('id'=>$this->uid))->find();
         $this->assign('stuinfo',$stuinfo);
@@ -66,7 +66,7 @@ class StuAction extends BaseAction{
         else{
             echo 'error';
         }
-        print_arr($data);
+        $this->redirect('index');
     }
 
     //导师列表
@@ -76,6 +76,7 @@ class StuAction extends BaseAction{
     //如果已经选择这位导师，也为不可操作
     //学生如果进入毕业名单，不可进行所有操作，需联系管理员
     public function tutor(){
+		
         $this->tologin();
         //学生是否已经毕业
         $graduate_mysql = M('graduate');
@@ -99,7 +100,7 @@ class StuAction extends BaseAction{
         //判断此导师是否可进行操作
         if($all_publish_tutor){
             foreach ($all_publish_tutor as &$one){
-                if($tutor_num >= 3 || in_array($one['id'], $temp) || count($stututor_mysql->where(array('tutor_id'=>$one['id']))->select()) >=  C('MAX_STU_NUM')){
+                if($tutor_num >= 3 || in_array($one['id'], $temp) || count($stututor_mysql->where(array('tutor_id'=>$one['id'],'in_date'=>$_SESSION['in_date']))->select()) >=  C('MAX_STU_NUM')){
                     $one['operate'] = 0;
                 }else{
                     $one['operate'] = 1;
@@ -126,8 +127,13 @@ class StuAction extends BaseAction{
         //判断导师信息是否处于发布状态
         $tutor_mysql = M('tutor');
         $tutor_mysql->where(array('id'=>  $this->post['tutor_id']))->getField('status') || exit('not publish!');
+		
+		//判断此导师人数是不是已经超标
+		if(count($stututor_mysql->where(array('tutor_id'=>$this->post['tutor_id'],'in_date'=>$_SESSION['in_date']))->select()) >=  C('MAX_STU_NUM')){
+			exit('error!');
+		}
         
-        if($stututor_mysql->data(array('stu_id'=>  $this->uid,'tutor_id'=>  $this->post['tutor_id']))->add()){
+        if($stututor_mysql->data(array('stu_id'=>  $this->uid,'tutor_id'=>  $this->post['tutor_id'],'in_date'=>$_SESSION['in_date']))->add()){
             $this->redirect('choosetutorresult');
         }  else {
            exit('Add to Mysql Wrong');
@@ -175,7 +181,7 @@ class StuAction extends BaseAction{
 
 
     //浏览实习单位
-    public function practice(){
+    public function practice($in_date){
         //学生是否已经毕业
         $graduate_mysql = M('graduate');
         !$graduate_mysql->where(array('stu_id'=>  $this->uid))->find() || exit('You have Graduate!');
@@ -189,6 +195,7 @@ class StuAction extends BaseAction{
         foreach ($all_practice_id as $one){
             array_push($temp, $one['practice_id']);
         }
+		
 
         
         //列出所有发布了招收学生的老师
@@ -222,6 +229,7 @@ class StuAction extends BaseAction{
         }
         
         $this->assign('all_publish_practice',$all_publish_practice_toassign);
+
         
         $this->display();
     }
@@ -237,6 +245,8 @@ class StuAction extends BaseAction{
         $practice_mysql = M('practice');
         $practice_mysql->where(array('id'=>  $this->post['practice_id']))->getField('status') || exit('not publish!');
         
+        $result = $stupractice_mysql->add(array('stu_id'=>  $this->uid,'practice_id'=>  $this->post['practice_id']));
+        var_dump($result);die;
         if($stupractice_mysql->data(array('stu_id'=>  $this->uid,'practice_id'=>  $this->post['practice_id']))->add()){
             $this->redirect('choosepracticeresult');
         }  else {

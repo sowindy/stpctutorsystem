@@ -16,6 +16,15 @@
             <div class="profile_wrapper">
                 <span>手机：</span><input type="text" id="tag_input" class="user_input" name="phone" value="" />
             </div>
+            <div class="profile_wrapper">
+                <span>年级：</span>
+                <select name="in_date" class="select_job">
+                	<option value="<?php echo date('Y'); ?>"><?php echo date('Y'); ?></option>
+                	<option value="<?php echo date('Y')-1; ?>"><?php echo date('Y')-1; ?></option>
+                	<option value="<?php echo date('Y')-2; ?>"><?php echo date('Y')-2; ?></option>
+                	<option value="<?php echo date('Y')-3; ?>"><?php echo date('Y')-3; ?></option>
+                </select>
+            </div>
             <div class="w"></div>
             <div class="profile_wrapper">
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><input type="submit" name="" value="保存" class="rect_button save" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

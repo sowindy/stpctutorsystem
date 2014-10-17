@@ -37,6 +37,7 @@ return array (
   34 => 'type',
   35 => 'corporate',
   36 => 'corporate_about',
+  37 => 'in_date',
   '_autoinc' => true,
   '_pk' => 'id',
 );

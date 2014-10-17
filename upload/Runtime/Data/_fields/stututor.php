@@ -5,6 +5,7 @@ return array (
   2 => 'mark',
   3 => 'status',
   4 => 'isadmin',
+  5 => 'in_date',
   '_autoinc' => false,
   '_pk' => 'tutor_id',
 );

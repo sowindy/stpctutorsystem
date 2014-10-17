@@ -28,7 +28,6 @@ class IndexAction extends BaseAction
     function index()//首页显示
 		{
 			$this->assign('title',$this->setting['site_name']);
-                        header("Content-Type:text/html; charset=utf-8");
 			$this->display();
 		}	
     function all()
@@ -308,24 +307,23 @@ class IndexAction extends BaseAction
         }
         
         public function handler(){
-            
             $this->uid || exit('Error!');
           
             if($this->post['type'] == 'stu')
-            ($this->post['name'] && $this->post['phone'] && $this->post['number'] && $this->post['email']) || exit('Error!');
+            ($this->post['name'] && $this->post['phone'] && $this->post['number'] && $this->post['email']&&$this->post['in_date']) || exit('Error!');
             elseif($this->post['type'] == 'tutor')
             ($this->post['name'] && $this->post['phone'] && $this->post['email']) || exit('Error!');
             elseif($this->post['type'] == 'practice') 
             ($this->post['name'] && $this->post['phone'] &&  $this->post['email']) && $this->post['corporate'] || exit('Error!');
             else exit('Error!');
             $this->post['id'] = $this->uid;
-            $this->post['time'] = date('Y-m-d H:m:s');
+            $this->post['time'] = date('Y-m-d H:i:s');
             
             $apply_mysql = M('apply');
             if($apply_mysql->add($this->post)){
-                $this->redirect('index', NULL, 3, 'Success!');
+                $this->redirect('index', NULL, 3, '申请成功，请等待申请结果!');
             }else{
-                $this->redirect('index',NULL,3,'have already applied!');
+                $this->redirect('index',NULL,3,'您已经申请过了，请等待审核结果，不需要重复申请！');
             }
         }
 }

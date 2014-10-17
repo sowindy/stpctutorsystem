@@ -27,6 +27,12 @@ class BaseAction extends Action {
     public $uid;//全局公用用户uid
     public $sign;//全局公用标示，是“社会化问答”还是“论坛”
     public function _initialize() {//全局初始化函数
+    	if(strpos($_SERVER["HTTP_USER_AGENT"], 'MSIE 8.0')||strpos($_SERVER["HTTP_USER_AGENT"], 'MSIE 7.0')||strpos($_SERVER["HTTP_USER_AGENT"], 'MSIE 6.0')){
+    	$this->display('Base/change');
+		die;
+		}
+    	
+    	header("Content-Type:text/html; charset=utf-8");
         if (!F('setting')) {//如果没有后台设置缓存，则将后台设置缓存
             $setting = M('setting')->select();
             $set = array();
@@ -206,8 +212,11 @@ class BaseAction extends Action {
         }
         if($this->uid){
             $user_mysql = M('user');
-            $type = $user_mysql->field('type')->find($this->uid);
+            $type = $user_mysql->field('type,in_date')->find($this->uid);
             Session::set('type',$type['type']);
+			
+			//学生入学年级
+			Session::set('in_date',$type['in_date']);
         }
     }
 }

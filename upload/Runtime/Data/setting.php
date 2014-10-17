@@ -1,6 +1,6 @@
 <?php
 return array (
-  'reply_self' => '1',
+  'reply_self' => '0',
   'auth_key' => 'bB2U1o4I8L75cl0D5r763r4e1v3AfG756P8A4V8K3DbybQ1jeH0K0j7Ac77CbA5b',
   'reply_min_wordcount' => '5',
   'reply_per_page' => '10',

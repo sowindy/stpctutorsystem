@@ -182,8 +182,19 @@
 
 			<div class="main-content">
 				<div class="breadcrumbs" id="breadcrumbs">
+					<a href="<?php echo U('export_stu_tutor',array('grade'=>$grade));?>" class="btn btn-success btn-small" style="float: right;margin:5px 10px 0 10px">导出结果</a>
+					<div style="float: right;margin-top: 5px;">
+					<form id="submit_grade" method="get" action="<?php echo U('viewstu');?>">
+						请选择年级：
+						<select name="grade" id="grade">
+							<?php for($i=date('Y');$i>=2009;$i--){ ?>
+							<option value="<?php echo ($i); ?>"><?php echo ($i); ?></option>
+							<?php } ?>
+						</select>
+					</form>
+					</div>
 				</div>
-
+				
 				<div class="page-content">
                                     <table class="table table-bordered table-condensed table-striped datatable">
                                         <thead>
@@ -191,11 +202,11 @@
                                                 <th>学号</th>
                                                 <th>姓名</th>
                                                 <th>手机</th>
-                                                <th>邮箱</th>
-                                                <th>QQ</th>
+                                                <th width="18%">邮箱</th>
+                                                <th width="8%">QQ</th>
                                                 <th>导师</th>
                                                 <th>实习</th>
-                                                <th>操作</th>
+                                                <th width="18%">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -241,18 +252,6 @@
 			<i class="icon-double-angle-up icon-only bigger-110"></i>
 		</a>
 
-		<!--basic scripts-->
-
-		<!--[if !IE]>-->
-
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-		<!--<![endif]-->
-
-		<!--[if IE]>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<![endif]-->
-
 		<!--[if !IE]>-->
 
 		<script type="text/javascript">
@@ -295,12 +294,20 @@
 				$('#id-check-horizontal').removeAttr('checked').on('click', function(){
 					$('#dt-list-1').toggleClass('dl-horizontal').prev().html(this.checked ? '&lt;dl class="dl-horizontal"&gt;' : '&lt;dl&gt;');
 				});
+				
+				$("#grade").val(<?php echo ($grade); ?>);
 			
 			})
                         $('#modal-wizard .modal-header').ace_wizard();
                         $('#modal-wizard .wizard-actions .btn[data-dismiss=modal]').removeAttr('disabled');
                         $('.datatable').dataTable({
                         });
+                        
+                        $('#grade').change(
+                        	function(){
+	                        	$('#submit_grade').submit();
+                        	}
+                        );
 		</script>
 	</body>
 

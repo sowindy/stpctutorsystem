@@ -182,6 +182,17 @@
 
 			<div class="main-content">
 				<div class="breadcrumbs" id="breadcrumbs">
+					<div style="float: right;margin-top: 5px;">
+					<form id="submit_grade" method="get" action="@#:U('allocatetutor')#@">
+						请选择年级：
+						<select name="grade" id="grade">
+							<?php for($i=date('Y');$i>=2009;$i--){ ?>
+							<option value="@#$i#@">@#$i#@</option>
+							<?php } ?>
+						</select>
+					</form>
+					</div>
+					
 				</div>
 
 				<div class="page-content">
@@ -200,19 +211,21 @@
                                                         <th>学号</th>
                                                         <th>姓名</th>
                                                         <th>性别</th>
-                                                        <th>其他</th>
+                                                        <th>联系方式</th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <?php foreach($stu as $one): ?>
+                                                    	<tr>
                                                         <th>@#$one.stu_number#@</th>
                                                         <th>@#$one.stu_name#@</th>
                                                         <th><?php if($one['stu_sex'] == 0) echo "女";elseif($one['stu_sex'] == 1) echo "男"; ?></th>
-                                                        <th><a href="#" class="btn btn-info btn-mini">查看详细</a></th>
+                                                        <th>@#$one.stu_phone#@</th>
                                                         <th style="text-align: center">
                                                             <input type="checkbox" name="stu[]" class="stu-choose" value="@#$one.id#@" style="position: inherit;opacity: 1" />
                                                         </th>
+                                                       </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>
@@ -226,9 +239,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th>姓名</th>
-                                                        <th>研究方向</th>
                                                         <th>职称</th>
-                                                        <th>其他</th>
+                                                        <th>联系方式</th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>
@@ -237,7 +249,6 @@
                                                         <?php if($one['stunumber'] >= 6) continue; ?>
                                                         <tr>
                                                             <th>@#$one.name#@<span class="badge badge-important">@#$one.stunumber#@</span></th>
-                                                            <th>@#$one.direction#@</th>
                                                             <th>
                                                                 <?php if($one['position'] == 1): ?>
                                                                         教授
@@ -247,13 +258,14 @@
                                                                         讲师
                                                                         <?php endif; ?>
                                                             </th>
-                                                            <th><a href="#" class="btn btn-info btn-mini">查看详细</a></th>
+                                                            <th>@#$one.phone#@</th>
                                                             <th style="text-align: center"><input type="radio" name="tutor" value="@#$one.id#@" style="position: inherit;opacity: 1" /></th>
                                                         </tr>
                                                     <?php endforeach; ?>
 
                                                 </tbody>
                                             </table>
+                                            <input type="hidden" name="grade" value="@#$grade#@"  />
                                         </div>
                                     </form>
 				</div><!--/.page-content-->
@@ -265,16 +277,6 @@
 		</a>
 
 		<!--basic scripts-->
-
-		<!--[if !IE]>-->
-
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-		<!--<![endif]-->
-
-		<!--[if IE]>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<![endif]-->
 
 		<!--[if !IE]>-->
 
@@ -325,6 +327,13 @@
                     
                         $('.datatable').dataTable({
                         });
+                        
+                        $("#grade").val(@#$grade#@);
+                        $('#grade').change(
+                        	function(){
+	                        	$('#submit_grade').submit();
+                        	}
+                        );
 		</script>
 	</body>
 

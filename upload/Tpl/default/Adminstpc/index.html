@@ -182,11 +182,57 @@
 
 			<div class="main-content">
 				<div class="breadcrumbs" id="breadcrumbs">
+					<div style="float: right;">
+						<a href="#detail_import_teacher" class="btn btn-success btn-small" data-toggle="modal">导入学生</a>
+                    	<div id="detail_import_teacher" class="modal hide fade span8" style="left: 20%" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    		<form action="@#:U('import_teacher')#@" method="post" enctype="multipart/form-data">
+                        	<div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                <h3 id="myModalLabel">请上传要导入的老师文件</h3>
+                            </div>
+                            <div class="modal-body">
+                            	<h4 class="text-warning">请注意excel文本格式的正确性，否则会出现意想不到的错误！</h4>
+                            	<input type="file" name="teacher" class="ace-file-input input" />
+                            	<input type="hidden" name="ha" value="@#$ha#@" />
+                            	请选择年级：
+								<select name="grade" id="grade">
+									<?php for($i=date('Y');$i>=2009;$i--){ ?>
+									<option value="@#$i#@">@#$i#@</option>
+									<?php } ?>
+								</select>
+                            </div>
+                            <div class="modal-footer">
+                            	<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">取消</button>
+                            	<button class="btn btn-success" aria-hidden="true">确定</button>
+                            </div>
+                           </form>
+                       	</div>
+                       	
+                       	<a href="#detail_import_stu" class="btn btn-success btn-small" data-toggle="modal">导入老师</a>
+                    	<div id="detail_import_stu" class="modal hide fade span8" style="left: 20%" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    		<form action="@#:U('import_stu')#@" method="post" enctype="multipart/form-data">
+                        	<div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                <h3 id="myModalLabel">请上传要导入的学生文件</h3>
+                            </div>
+                            <div class="modal-body">
+                            	<h4 class="text-warning">请注意excel文本格式的正确性，否则会出现意想不到的错误！</h4>
+                            	<input type="file" name="teacher" class="ace-file-input input" />
+                            	<input type="hidden" name="ha" value="@#$ha#@" />
+                            </div>
+                            <div class="modal-footer">
+                            	<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">取消</button>
+                            	<button class="btn btn-success" aria-hidden="true">确定</button>
+                            </div>
+                           </form>
+                       	</div>
+					</div>
 				</div>
 
 				<div class="page-content">
                                     <table class="table table-bordered table-condensed">
                                         <thead>
+                                        	<?php if(!empty($apply)): ?>
                                             <tr>
                                                 <th>昵称</th>
                                                 <th>姓名</th>
@@ -195,8 +241,12 @@
                                                 <th>邮箱</th>
                                                 <th>手机号</th>
                                                 <th>状态</th>
-                                                <th style="width: 13%">操作</th>
+                                                <th>年级</th>
+                                                <th style="width: 17%">操作</th>
                                             </tr>
+                                         	<?php else: ?>
+                                         		<tr>暂无需要处理的申请记录！</tr>
+                                         	<?php endif; ?>
                                         </thead>
                                         <tbody>
                                             <?php foreach($apply as $one): ?>
@@ -207,14 +257,14 @@
                                                     <?php if($one['number']): ?>
                                                     @#$one.number#@
                                                     <?php else: ?>
-                                                    ————
+                                                    ——
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>
                                                     <?php if($one['corporate']): ?>
                                                     @#$one.corporate#@
                                                     <?php else: ?>
-                                                    ————
+                                                    ——
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>@#$one.email#@</td>
@@ -228,6 +278,7 @@
                                                     <label class="badge badge-purple">申请为公司</label>
                                                     <?php endif; ?>
                                                 </td>
+                                                <td>@#$one.in_date#@</td>
                                                 <td>
                                                     <a href="@#:U('passby',array('id'=>$one['id']))#@" class="btn btn-mini btn-success">审核通过</a>
                                                     <a href="@#:U('refuse',array('id'=>$one['id']))#@" class="btn btn-mini btn-danger">拒绝申请</a>
@@ -245,16 +296,6 @@
 		</a>
 
 		<!--basic scripts-->
-
-		<!--[if !IE]>-->
-
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-		<!--<![endif]-->
-
-		<!--[if IE]>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<![endif]-->
 
 		<!--[if !IE]>-->
 

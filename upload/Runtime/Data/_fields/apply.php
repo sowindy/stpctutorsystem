@@ -8,6 +8,7 @@ return array (
   5 => 'time',
   6 => 'type',
   7 => 'email',
+  8 => 'in_date',
   '_autoinc' => false,
   '_pk' => 'id',
 );

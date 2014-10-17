@@ -28,7 +28,7 @@ class TutorAction extends BaseAction{
     //导师信息修改界面
     public function info(){
         $this->tologin();
-        $this->assign('title',导师信息更新/修改);
+        $this->assign('title','导师信息更新/修改');
         $tutor_mysql = M('tutor');
         $tutor_info = $tutor_mysql->where(array('id'=>  $this->uid))->find();
         $this->assign("tutorinfo",  $tutor_info);
@@ -139,6 +139,7 @@ class TutorAction extends BaseAction{
             continue;
         }
         $this->assign('allstuinfo',$to_choose);
+		
         $this->display();
     }
     
@@ -167,8 +168,11 @@ class TutorAction extends BaseAction{
     }
     
     public function yes(){
+    	
+		
         $stututor_mysql = M('stututor');
-        $stu_num = count($stututor_mysql->where(array('tutor_id'=>  $this->uid,'status'=>1))->field('stu_id')->select());
+		$in_date = M('user')->field('in_date')->find($this->post['id']);
+        $stu_num = count($stututor_mysql->where(array('tutor_id'=>  $this->uid,'status'=>1,'in_date'=>$in_date['in_date']))->field('stu_id')->select());
         if($stu_num >= C('MAX_STU_NUM')){
             exit('Your Stu Number over MAX_STU_NUM');
         }
